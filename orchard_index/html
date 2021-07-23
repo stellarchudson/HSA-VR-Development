@@ -1,0 +1,559 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>VR Networked World</title>
+    <meta name="description" content="VR Networked World" />
+    
+
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
+    <script src="https://unpkg.com/networked-aframe@^0.8.0/dist/networked-aframe.min.js"></script>
+
+    <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/gh/oneWaveAdrian/aframe-particle-system-component@aframe-1.2.0-upgrade/dist/aframe-particle-system-component.min.js"></script> 
+    <script src="/js/spawn-in-circle.component.js"></script>
+
+    <script src="https://rawgit.com/fernandojsg/aframe-teleport-controls/master/dist/aframe-teleport-controls.min.js"></script>
+    <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script>
+  <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v4.1.2/dist/aframe-extras.min.js"></script>
+  <script src="https://unpkg.com/super-hands@^3.0.1/dist/super-hands.min.js"></script>
+    <script src="https://rawgit.com/msj121/aframeFrogShaders/master/aframe-shader-frog.js"></script>
+    <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
+  </head>
+
+  <body>
+
+    <a-scene
+      networked-scene="
+      room: basic;
+      adapter: easyrtc;
+      audio: true;
+      debug: true;
+    "
+    >
+      <a-assets>
+        
+        <img id="treeimg" src="https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Fbackgrndfoliage.png?v=1626369852125">
+        
+        <audio id="wrong" src="https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Fthunder_strike_1-Mike_Koenig-739781745.mp3?v=1626721081505" preload="auto"></audio>
+        
+        <a-asset-item
+          id="model"
+          class="model"
+          src="https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Forchbase.glb?v=1626832195995"
+        ></a-asset-item>
+
+        <a-asset-item
+          id="body"
+          src="https://cdn.glitch.com/3ea982eb-b261-42c1-8739-a877a49f050f%2Fguy_head.glb?v=1626983272977"
+        ></a-asset-item>
+        
+        <a-asset-item
+          id="apple"
+          src="https://cdn.glitch.com/6afe4234-0e44-449a-a2fa-e896d5ec436a%2Fapple.glb?v=1624406446241"
+        ></a-asset-item>
+        
+        <a-asset-item
+          id="orange"
+          src="https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Fornge.glb?v=1626391364785"
+        ></a-asset-item>
+        
+        <a-asset-item
+          id="twee"
+          src="https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Fpolytreeapple.glb?v=1626390523311"
+        ></a-asset-item>
+        
+         <a-asset-item
+          id="orngtwee"
+          src="https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Fpolytreeorng.glb?v=1626390522404"
+        ></a-asset-item>
+        
+         <a-asset-item
+          id="basket"
+          src="https://cdn.glitch.com/ed89a5b1-7fa5-440d-8c4e-cbd603a4f6b3%2Fbasket2.glb?v=1624997425179"
+        ></a-asset-item>
+        
+        <a-asset-item
+          id="sign"
+          src="https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Fsign.glb?v=1626395218131"
+        ></a-asset-item>
+        
+         <a-asset-item
+          id="bgktree"
+          src="https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Ftreeline.glb?v=1626830739840"
+        ></a-asset-item>
+        
+        <a-asset-item
+          id="bgtree"
+          src="https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Ftreeline.glb?v=1626830739840"
+        ></a-asset-item>
+        
+<!--         <a-asset-item
+          id="tweeback"
+          src="https://cdn.glitch.com/ed89a5b1-7fa5-440d-8c4e-cbd603a4f6b3%2Fbackgroundtree.glb?v=1624686707406"
+        ></a-asset-item> -->
+
+        <!-- Templates -->
+
+        <template id="player-template">
+          <a-entity networked-audio-source></a-entity>
+        </template>
+
+        <!-- Avatar -->
+
+
+
+        <template id="head-template">
+          <a-entity class="avatar">
+            <a-entity
+              class="head"
+              gltf-model="#body"
+              rotation="-20 180 0"
+              position="0 -.6 0"
+              scale="0.2 0.2 0.2"
+            ></a-entity>
+          
+          </a-entity>
+        </template>
+
+        <!-- /Templates -->
+
+        <template id="hand-template">
+          <a-entity>
+    
+            <a-sphere color="red" radius="0.1"></a-sphere>
+          </a-entity>
+        </template>
+        
+        <template id="apple-template">
+          <a-entity>
+          <a-entity
+                    class="apple-ig"
+                    gltf-model="#apple"
+                    position="0 0 0"
+                    scale=".05 .05 .05"></a-entity>
+          </a-entity>
+        </template>
+        
+      </a-assets>
+
+      <a-entity
+        id="player"
+        networked="template:#player-template;attachTemplateToLocal:false;"
+        spawn-in-circle="radius:3"
+      >
+        <a-entity
+          id="head"
+          camera
+          position="0 1.6 0"
+          look-controls
+          wasd-controls
+          networked="template:#head-template;attachTemplateToLocal:false;"
+        >
+          <a-entity cursor="fuse: false"  position="0 0 -1"   geometry="primitive:ring; radiusInner: 0.02; radiusOuter: 0.03"  material="color: black; shader: flat"></a-entity>
+          <a-sphere class="head" random-color visible="false"></a-sphere>
+        </a-entity>
+
+        <a-entity
+          id="ctlL"
+          teleport-controls="cameraRig: #player; teleportOrigin: #head; startEvents: teleportstart; endEvents: teleportend"
+          raycaster="objects: .collidable; far:1.2;"
+          laser-controls="hand: left"
+          input-listen
+        >
+          <a-text
+            value="X: Teleport"
+            position="0 0.05 0"
+            rotation="-90 2 0"
+            scale="0.1 0.1 0.1"
+            align="center"
+            color="#FFFFFF"
+          ></a-text>
+        </a-entity>
+
+        <a-entity
+          id="ctlR"
+          raycaster="objects: .collidable; far:1.2;"
+          laser-controls="hand: right"
+          input-listen
+        >
+          <a-text
+            value="This is your hand!"
+            position="0 0.05 0"
+            rotation="-90 0 0"
+            scale="0.1 0.1 0.1"
+            align="center"
+            color="#FFFFFF"
+          ></a-text>
+          
+        </a-entity>
+
+        <a-entity
+          hand-controls="hand:left"
+          networked="template:#hand-template;"
+        ></a-entity>
+        <a-entity
+          hand-controls="hand:right"
+          networked="template:#hand-template;"
+        ></a-entity>
+        
+        <a-entity sphere-collider="objects: a-box" super-hands hand-controls="hand: left"></a-entity>
+      <a-entity sphere-collider="objects: a-box" super-hands hand-controls="hand: right"></a-entity>
+        
+      </a-entity>
+
+      <!--
+      <a-entity id="player"
+                camera
+                networked="template:#head-template;attachTemplateToLocal:false;"
+                position="0 1.6 0"
+                spawn-in-circle="radius:3"
+                wasd-controls
+                look-controls>
+        <a-sphere class="head"
+          visible="false"
+          random-colorhand
+        ></a-sphere>
+      </a-entity>
+      -->
+      
+<!--       <a-sphere shader-frog="src:url(<shader url>.json)"></a-sphere> -->
+
+      <a-sky
+        src="https://cdn.glitch.com/ed89a5b1-7fa5-440d-8c4e-cbd603a4f6b3%2Forchard2.png?v=1624654516582"
+      ></a-sky>
+
+      <a-entity
+        id="glbtest"
+        gltf-model="#model"
+        position="5.216 -3 0"
+        scale="5 5 5"
+      ></a-entity> 
+      
+      <a-entity
+                id="a"
+        gltf-model="#twee"
+        position="-0.07 3 11"
+        scale="0.7 0.7 0.7"
+      ></a-entity> 
+      
+      <a-entity
+                id="b"
+        gltf-model="#twee"
+        position="-0.19 3 -5"
+        scale="0.7 0.7 0.7"
+      ></a-entity> 
+      
+      <a-entity
+                id="c"
+        gltf-model="#twee"
+        position="3 3 -13"
+        scale="0.7 0.7 0.7"
+      ></a-entity> 
+      
+      <a-entity
+                id="e"
+        gltf-model="#twee"
+        position="-1 3 6"
+        scale="0.7 0.7 0.7"
+      ></a-entity> 
+      
+       <a-entity
+                 id="f"
+        gltf-model="#twee"
+        position="-1 3 -9"
+        scale="0.7 0.7 0.7"
+      ></a-entity> 
+      
+      <!-- other side -->
+      
+      <a-entity
+                id="g"
+        gltf-model="#orngtwee"
+        position="7 3 -10"
+        scale="0.7 0.7 0.7"
+      ></a-entity> 
+      
+      <a-entity
+                id="h"
+        gltf-model="orng#twee"
+        position="7 3 -12"
+        scale="0.7 0.7 0.7"
+      ></a-entity> 
+      
+      <a-entity
+                id="i"
+        gltf-model="#orngtwee"
+        position="7 3 2"
+        scale="0.7 0.7 0.7"
+      ></a-entity> 
+      
+      <a-entity
+                id="j"
+        gltf-model="#orngtwee"
+        position="7 3 6"
+        scale="0.7 0.7 0.7"
+      ></a-entity> 
+      
+       <a-entity
+                 id="k"
+        gltf-model="#orngtwee"
+        position="7 3 12"
+        scale="0.7 0.7 0.7"
+      ></a-entity> 
+      
+      <a-entity
+                id="l"
+        gltf-model="#orngtwee"
+        position="7 3 -4"
+        scale="0.7 0.7 0.7"
+      ></a-entity> 
+      
+      <a-entity
+        id="_basket"
+        gltf-model="#basket"
+        position="4.5 -0.2 0.8"
+        scale="5 5 5"
+        static-body="shape:box"
+        collision-detection-code
+      ></a-entity> 
+      
+      <a-entity
+        gltf-model="#sign"
+        position="2.9 0.02 2.7"
+        scale="0.1 0.1 0.1"
+        rotation="0 40 0"
+      ></a-entity> 
+      
+      <a-sound
+        src="url(https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Forchard.mp3?v=1626897439907)"
+        loop="true"
+        autoplay="true"
+      ></a-sound>
+      
+      
+      
+      
+<!--       <a-entity
+        gltf-model="#bgktree"
+        position="2 -2 0"
+        scale="2 2 2"
+        rotation="0 90 0"
+      ></a-entity>  -->
+      
+<!--       <a-entity gltf-model="https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Ftreeline.glb?v=1626830739840" position="47.83334 7 22.21945" scale="2 2 2" rotation="0 90 0"></a-entity>
+      <a-entity gltf-model="https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Ftreeline.glb?v=1626830739840" position="-47.83334 7 -22.21945" scale="2 2 2" rotation="0 -90 0"></a-entity> -->
+     
+       
+      <a-box 
+             id="apple-hopefully"
+             gltf-model="#apple"
+             networked="template:#apple-template;attachTemplateToLocal:false;"
+             hoverable grabbable stretchable draggable droppable color="red" position="3 1.9 -1.3" scale="0.2 0.2 0.02">
+            
+      </a-box>
+      
+      
+      <a-box 
+             id="testapple"
+             gltf-model="#apple"
+             networked="template:#apple-template;attachTemplateToLocal:false;"
+             hoverable grabbable stretchable draggable droppable color="red" position="3.2 1.9 -5" scale="0.2 0.2 0.2">
+            
+      </a-box>
+      
+      
+      
+      
+      <a-box 
+             id = "1"
+             gltf-model="#apple"
+             networked="template:#apple-template;attachTemplateToLocal:false;"
+             hoverable grabbable stretchable draggable droppable color="red" position="2.5 1.6 4.8" scale="0.15 0.15 0.15">
+    
+      </a-box>
+      
+      <a-box 
+             id = "2"
+             gltf-model="#apple"
+             networked="template:#apple-template;attachTemplateToLocal:false;"
+             hoverable grabbable stretchable draggable droppable color="red" position="2 1.8 7.9" scale="0.15 0.15 0.15">
+          
+      </a-box>
+      
+      <a-box 
+             id = "3"
+             gltf-model="#apple"
+             networked="template:#apple-template;attachTemplateToLocal:false;"
+             hoverable grabbable stretchable draggable droppable color="red" position="3 1.4 -6" scale="0.15 0.15 0.15">
+
+      </a-box>
+      
+      <a-box 
+             id = "4"
+             gltf-model="#apple"
+             networked="template:#apple-template;attachTemplateToLocal:false;"
+             hoverable grabbable stretchable draggable droppable color="red" position="4 1.9 -15" scale="0.2 0.2 0.2">
+
+      </a-box>
+      
+      
+      <a-box 
+             id="org" gltf-model="#orange"
+             networked="template:#apple-template;attachTemplateToLocal:false;"
+             hoverable grabbable stretchable draggable droppable color="red" position="6.6 2 9.7" scale="0.2 0.2 0.2">
+   
+      </a-box>
+      
+      <a-box 
+             id="7"
+             gltf-model="#orange"
+             networked="template:#apple-template;attachTemplateToLocal:false;"
+             hoverable grabbable stretchable draggable droppable color="red" position="8 1 4" scale="0.25 0.25 0.25"
+             sound="src: url(https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Fwrong(2).mp3?v=1626987737817); on: click, abuttondown"
+             volume="10"
+             orangeclick>
+      </a-box>
+      
+      <a-box 
+             id="6"
+             gltf-model="#orange"
+             networked="template:#apple-template;attachTemplateToLocal:false;"
+             hoverable grabbable stretchable draggable droppable color="red" position="8 1 10" scale="0.2 0.2 0.2"
+            sound="src: url(https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Fwrong(2).mp3?v=1626987737817); on: click, abuttondown"
+             volume="10"
+             orangeclick
+             >
+      </a-box>
+      
+      <a-box 
+             id="8"
+             gltf-model="#orange"
+             networked="template:#apple-template;attachTemplateToLocal:false;"
+             hoverable grabbable stretchable draggable droppable color="red" position="8 3 -5" scale="0.1 0.1 0.1"
+            sound="src: url(https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Fwrong(2).mp3?v=1626987737817); on: click, abuttondown"
+             volume="10"
+             orangeclick
+             >
+      </a-box>
+      
+      <a-box id="5"
+             gltf-model="#orange"
+             networked="template:#apple-template;attachTemplateToLocal:false;"
+             hoverable grabbable stretchable draggable droppable color="red" position="7.9 1.5 -1.2" scale="0.1 0.1 0.1"
+             sound="src: url(https://cdn.glitch.com/d198354f-b71a-47cb-a214-20fed885b086%2Fwrong(2).mp3?v=1626987737817); on: click, abuttondown"
+             volume="10"
+             orangeclick>
+
+      </a-box>
+      
+      <a-entity sound="src: #wrong"></a-entity>
+<!--       <a-entity
+        hoverable grabbable stretchable draggable dropppable 
+        id="glbtest"
+        gltf-model="#apple"
+        position="0 0 0"
+        scale="2 2 2"
+      ></a-entity>  -->
+      
+      
+      
+      
+
+      
+    </a-scene>
+
+
+
+    <script>
+      AFRAME.registerComponent("input-listen", {
+        schema: {
+          inputTemplate: { default: "#input-template" }
+        },
+
+        init: function() {
+          //X-button Pressed
+          this.el.addEventListener("xbuttondown", function(e) {
+            this.emit("teleportstart");
+          });
+
+          //X-button Released
+          this.el.addEventListener("xbuttonup", function(e) {
+            this.emit("teleportend");
+          });
+          
+          this.el.addEventListener("abuttondown", function(e) {
+            this.el.components.sound.playSound();
+          });
+          
+        }
+      });
+    </script>
+    
+      <script>
+      AFRAME.registerComponent("orangeclick", {
+      
+        init: function() {
+          
+          console.log("new fashion rock and roll");
+          //var entity = document.querySelector('a-scene').sceneEl.querySelector("#soundyboy");
+          //entity.components.sound.pauseSound();
+          console.log("old fashion rock and roll");
+
+          //actions for specific objects here:
+          this.el.addEventListener("mousedown", function(evt) {
+            console.log("wah");
+            this.el.components.sound.playSound();
+            
+          });
+          
+          this.el.addEventListener("abuttondown", function(evt) {
+            console.log("wah");
+            this.el.components.sound.playSound();
+          });
+          
+          this.el.addEventListener("gripdown", function(evt) {
+            console.log("wah");
+            this.el.components.sound.playSound();
+          });
+          
+          console.log("no rock and roll");
+          
+        }
+      });
+    </script>
+      
+    <script>
+    
+      AFRAME.registerComponent("collision-detection-code", {
+        
+        init: function() {
+          this.el.addEventListener("collide", function(e) {
+            e.detail.body.el;
+            console.log("basket entered #" + e.detail.body.id);
+          });
+        }
+        
+      });
+    
+    </script>
+    
+    <script>
+    
+      AFRAME.registerComponent('displayposition', {
+        
+        init: function() {
+          
+          this.el.setAttribute('value', "x:" + this.el.object3D.position.x+
+                               ",y:"+this.el.object3D.position.y+
+                               ",z:"+this.el.object3D.position.z)
+          
+        }
+        
+      });
+    
+    </script>
+    
+  </body>
+</html>
