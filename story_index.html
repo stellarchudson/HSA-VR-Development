@@ -1,0 +1,327 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>VR Networked World</title>
+    <meta name="description" content="VR Networked World" />
+
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
+    <script src="https://unpkg.com/networked-aframe@^0.8.0/dist/networked-aframe.min.js"></script>
+
+    <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/oneWaveAdrian/aframe-particle-system-component@aframe-1.2.0-upgrade/dist/aframe-particle-system-component.min.js"></script>
+    <script src="/js/spawn-in-circle.component.js"></script>
+
+    <script src="https://rawgit.com/fernandojsg/aframe-teleport-controls/master/dist/aframe-teleport-controls.min.js"></script>
+    <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script>
+    <script src="//cdn.rawgit.com/donmccurdy/aframe-extras/v5.0.0/dist/aframe-extras.min.js"></script>
+  </head>
+
+  <body>
+    <a-scene
+      fog="type: linear; color: #172a30; far: 40; near: 13"
+      man-button
+      networked-scene="
+      room: basic;
+      adapter: easyrtc;
+      audio: true;
+      debug: true;
+    "
+    >
+    
+      
+      
+      <a-assets>
+        <a-asset-item
+          id="model"
+          class="model"
+          src="https://cdn.glitch.com/83f12a6c-4078-496a-a8ef-adc2613a6ab4%2Fforest3.glb?v=1626106482999"
+        ></a-asset-item>
+
+        <a-asset-item
+          id="body"
+          src="https://cdn.glitch.com/88a14e63-298b-4fc4-b270-9bf63f213a7d%2Fguy_head.glb?v=1626983186201"
+        ></a-asset-item>
+        
+        <a-asset-item
+          id="guy"
+          src="https://cdn.glitch.com/88a14e63-298b-4fc4-b270-9bf63f213a7d%2FRiding_Hood_Walkcycle_July_22.glb?v=1626987094064"
+        ></a-asset-item>
+        
+        <a-asset-item
+          id="noguy"
+          src="https://cdn.glitch.com/83f12a6c-4078-496a-a8ef-adc2613a6ab4%2Flittlered2.glb?v=1626301424340"
+        ></a-asset-item>
+        
+        <a-asset-item
+          id="wolf"
+          src="https://cdn.glitch.com/83f12a6c-4078-496a-a8ef-adc2613a6ab4%2Fwolftake3.glb?v=1626900603817"
+        ></a-asset-item>
+        
+          <a-asset-item
+          id="wolf-still"
+          src="https://cdn.glitch.com/83f12a6c-4078-496a-a8ef-adc2613a6ab4%2Fwolftake4.glb?v=1626901270079"
+        ></a-asset-item>
+        
+        
+        <a-asset-item
+          id="book"
+          src="https://cdn.glitch.com/83f12a6c-4078-496a-a8ef-adc2613a6ab4%2Fbook3.glb?v=1626300568978"
+        ></a-asset-item>
+        
+<!--         
+        <script id="link" type="text/html">
+          <a-entity class="link"
+            geometry="primitive: plane; height: 1; width: 1"
+            material="shader: flat; src: ${thumb}"
+            event-set__1="_event: mousedown; scale: 1 1 1"
+            event-set__2="_event: mouseup; scale: 1.2 1.2 1"
+            event-set__3="_event: mouseenter; scale: 1.2 1.2 1"
+            event-set__4="_event: mouseleave; scale: 1 1 1"
+            set-image="on: click; target: #image-360; src: ${src}"
+            sound="on: click; src: #click-sound"></a-entity>
+        </script> -->
+
+        <!-- Templates -->
+
+        <template id="player-template">
+          <a-entity networked-audio-source></a-entity>
+        </template>
+
+        <!-- Avatar -->
+
+    
+
+        <template id="head-template">
+          <a-entity class="avatar">
+            <a-entity
+              class="head"
+              gltf-model="#body"
+              rotation="0 180 0"
+              position="0 -.6 0"
+              scale="0.2 0.2 0.2"
+            ></a-entity>
+          
+          </a-entity>
+        </template>
+
+        <!-- /Templates -->
+
+        <template id="hand-template">
+          <a-entity>
+            <a-sphere color="red" radius="0.1"></a-sphere>
+          </a-entity>
+        </template>
+      </a-assets>
+
+      <a-entity
+        id="player"
+        networked="template:#player-template;attachTemplateToLocal:false;"
+        spawn-in-circle="radius:3"
+      >
+        <a-entity
+          id="head"
+          camera
+          position="0 1.6 0"
+          look-controls
+          wasd-controls
+          networked="template:#head-template;attachTemplateToLocal:false;"
+        >
+          <a-entity cursor="fuse: false"  position="0 0 -1"   geometry="primitive:ring; radiusInner: 0.02; radiusOuter: 0.03"  material="color: black; shader: flat"></a-entity>
+          <a-sphere class="head" random-color visible="false"></a-sphere>
+        </a-entity>
+        <a-entity
+          id="ctlL"
+          teleport-controls="cameraRig: #player; teleportOrigin: #head; startEvents: teleportstart; endEvents: teleportend"
+          raycaster="objects: .collidable; far:1.2;"
+          laser-controls="hand: left"
+          input-listen
+        >
+          <a-text
+            value="X: Teleport"
+            position="0 0.05 0"
+            rotation="-90 2 0"
+            scale="0.1 0.1 0.1"
+            align="center"
+            color="#FFFFFF"
+          ></a-text>
+        </a-entity>
+
+        <a-entity
+          id="ctlR"
+          raycaster="objects: .collidable; far:1.2;"
+          laser-controls="hand: right"
+          input-listen
+        >
+          <a-text
+            value="This is your hand!"
+            position="0 0.05 0"
+            rotation="-90 0 0"
+            scale="0.1 0.1 0.1"
+            align="center"
+            color="#FFFFFF"
+          ></a-text>
+        </a-entity>
+
+        <a-entity
+          hand-controls="hand:left"
+          networked="template:#hand-template;"
+        ></a-entity>
+        <a-entity
+          hand-controls="hand:right"
+          networked="template:#hand-template;"
+        ></a-entity>
+        
+        
+        
+      </a-entity>
+
+<!--       <a-box id="manbutton" position="10 1 -5" rotation="0 45 0" color="blue"></a-box> -->
+      
+      <a-entity
+                id="manbutton" gltf-model="#book" position="10 0 -5" rotation="0 45 0"
+                >
+      <a-text
+            value="¿A donde va ella?
+                   ¿De que color es su vestido?
+                   ¿Quien esta detras de la casa?
+                   "
+            scale="1.2 1.2 1.2"
+            align="center"
+            position="2 3 0"
+            rotation="0 -90 0"
+            color="#FFFFFF"
+          ></a-text>
+      </a-entity>
+
+      <a-sky
+        src="https://cdn.glitch.com/59952914-2cb3-43c1-a89b-c73c3d6ebfcc%2Fsky.png?v=1624051483808"
+      ></a-sky>
+
+      <a-entity
+        id="glbtest"
+        gltf-model="#model"
+        position="0 0 0"
+        scale="7 7 7"
+      ></a-entity>
+      
+      <a-entity
+        id="theman"
+        gltf-model="#guy"
+        position="0.5 0 5.8"
+        animation-mixer
+                loop="false"
+        scale="1 1 1"
+        visible="false"
+      ></a-entity>
+      
+      <a-entity
+        id="noman"
+        gltf-model="#noguy"
+        position="10 1.5 0"
+        scale="1 1 1"
+        visible="true"
+      ></a-entity>
+      
+      <a-entity
+        id="lego"
+        gltf-model="#wolf"
+        position="-13 -1 18"
+        animation-mixer
+                loop="false"
+        scale="0.7 0.7 0.7"
+        visible="false"
+      ></a-entity>
+      
+      <a-entity
+        id="legoshi"
+        gltf-model="#wolf-still"
+        position="0 -1 80"
+        scale="0.7 0.7 0.7"
+        visible="true"
+      ></a-entity>
+      
+
+      <a-sound
+        src="url(https://cdn.glitch.com/88a14e63-298b-4fc4-b270-9bf63f213a7d%2Fforest.mp3?v=1626987673830)"
+        loop="true"
+        autoplay="true"
+               volume="3"
+               position="0 7 0"
+      ></a-sound>
+      
+
+      
+      <a-entity light="type: ambient; color: white"></a-entity>
+    </a-scene>
+
+    <script>
+      AFRAME.registerComponent("input-listen", {
+        schema: {
+          inputTemplate: { default: "#input-template" }
+        },
+
+        init: function() {
+          
+          var noman = document.querySelector('a-scene').sceneEl.querySelector("#noman");
+          var theman = document.querySelector('a-scene').sceneEl.querySelector("#theman");
+          var nowolf = document.querySelector('a-scene').sceneEl.querySelector("#legoshi");
+          var thewolf = document.querySelector('a-scene').sceneEl.querySelector("#lego");
+          var button = document.querySelector('a-scene').sceneEl.querySelector("#manbutton");
+          
+          //X-button Pressed
+          this.el.addEventListener("xbuttondown", function(e) {
+            this.emit("teleportstart");
+          });
+
+          //X-button Released
+          this.el.addEventListener("xbuttonup", function(e) {
+            this.emit("teleportend");
+          });
+          
+          //a-button Released
+          this.el.addEventListener("abuttondown", function(e) {
+            theman.setAttribute('visible', "true");
+            noman.setAttribute('visible', "false");
+            thewolf.setAttribute('visible', "true");
+            nowolf.setAttribute('visible', "false");
+          });
+        }
+      });
+    </script>
+    
+    <script>
+      AFRAME.registerComponent("man-button", {
+        init: function() {
+          //add any new button here:
+          var noman = document.querySelector('a-scene').sceneEl.querySelector("#noman");
+          var theman = document.querySelector('a-scene').sceneEl.querySelector("#theman");
+          var nowolf = document.querySelector('a-scene').sceneEl.querySelector("#legoshi");
+          var thewolf = document.querySelector('a-scene').sceneEl.querySelector("#lego");
+          var button = document.querySelector('a-scene').sceneEl.querySelector("#manbutton");
+          
+          //actions for specific objects here:
+          button.addEventListener("mousedown", function(evt) {
+            theman.setAttribute('visible', "true");
+            noman.setAttribute('visible', "false");
+            thewolf.setAttribute('visible', "true");
+            nowolf.setAttribute('visible', "false");
+          });
+          button.addEventListener("abuttondown", function(evt) {
+            theman.setAttribute('visible', "true");
+            noman.setAttribute('visible', "false");
+            thewolf.setAttribute('visible', "true");
+            nowolf.setAttribute('visible', "false");
+          });
+          //add box around boy that's inivisble to add collision to make the man a button
+          // button.addEventListener("mouseleave", function(evt) {
+          //   theman.setAttribute('visible', "false");
+          //   noman.setAttribute('visible', "true")
+          // })
+        }
+      });
+    </script>
+    
+  </body>
+</html>
